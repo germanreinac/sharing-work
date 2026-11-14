@@ -20,6 +20,9 @@ slides:
     tight: false
     bleed: right
     pad: 10
+    logo: assets/clash-logo.png
+    logo_width: 360
+    logo_opacity: 1
 
   # 2–3. first pass, A and B (1HOwytx9CuFW6s2YZidGZ1wUluWl9SOEh)
   - type: plate

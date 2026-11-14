@@ -56,7 +56,12 @@ Both use the same house style, so the user's work always looks consistent.
 - Pick the style that matches the work: `styles/clash.yaml` for Clash of Clans and Supercell work, `styles/megalith.yaml` for Megalith.
 - `styles/clash.yaml` is taken from the Clash samples in `style samples`. Slides are 1080×1440 and use `plate` slides: full-bleed art on a matte that matches the art's own background, film grain, a vignette on dark slides, and one small dated label per slide.
   - `plate` options: `crop`, `rows` (split a wide sheet into stacked strips so it fits a portrait slide), `fill`, `bleed`, `pad`, `label`.
-  - Logos: add transparent PNGs to `assets/` and set `logo:` in the style or per slide. They aren't there yet; ask the user for them.
+  - Logos, from `assets/`:
+    - The Supercell logo goes on every slide in the plainest corner (`logo_pos: auto`), white on dark slides and dark grey on light ones. `supercell-white.png` is the official file from Drive.
+    - The cover also carries the Clash of Clans logo (`logo: assets/clash-logo.png`, `logo_width: 360`). It's cut out of the Greedy Raven sample.
+    - Keep logos small, so they don't cover the art.
+  - Default Clash format: `square-hd` (2160×2160). Use one subject per slide with tight crops, up to 20 slides. Never shrink a whole wide sheet onto one slide. Split it into its characters instead.
+  - Extra `plate` options: `erase` (paint out notes and insets, or use `"clone"` on textured backgrounds) and `tight` (auto-trim to the drawing, on by default).
 - `styles/megalith.yaml` holds the colours, font and labels. It is taken from the Megalith presentation board: dark `#1c1b20` background, yellow `#f3d36b` titles, off-white `#e9e6e2` captions, orange `#fd6848` "Behind the scenes" notes, Inter. New projects can get their own style file.
 - `posts/<YYYY-MM-DD>-<topic>/post.yaml` describes one post: style, size, slides and caption. Slide types are `cover`, `art`, `pair`, `grid` and `end`. A cover takes `focus`, from 0 (keep the top) to 1 (keep the bottom), to control the crop.
 - `python3 tools/carousel.py posts/<folder>/post.yaml` writes `out/<folder>/01.png …`, `caption.txt` and `preview.png`, which shows every slide in a row. Always look at `preview.png` before sending.
@@ -82,16 +87,17 @@ The user gives parameters (project, theme, character, period, number of slides, 
 1. Download the source images to `work/<job>/`, write `posts/<job>/post.yaml` and render.
 2. Check `preview.png` and fix anything that looks off.
 3. **Export every job to its own folder** in `sharing work online › exports`, named `<YYYY-MM-DD> <topic> (<format>)`, e.g. `2026-11-14 skit-dji-design (instagram carousel)`. Put in it the numbered slides, `caption.txt` and `preview.png`. Nothing goes loose in `exports`. When a job is redone, replace the files in its existing folder instead of making a second one.
-4. To upload, create the folder with `create_file` (mimeType `application/vnd.google-apps.folder`, parent = exports ID). Then upload each file with `create_file`, setting `base64Content` to `sha256:<hash>:<absolute path>` and `disableConversionToGoogleType: true`.
+4. **Upload limit:** each upload can carry about 3 MB. Export slides as JPEG at quality 95 (`format: jpg` in the style), which comes to about 1.6–2.4 MB at 2160 px. Lossless PNGs at that size don't go through. Drive can't overwrite a file's contents from here, so to redo a job, trash its old files and upload the new ones into the same folder.
+   To upload, create the folder with `create_file` (mimeType `application/vnd.google-apps.folder`, parent = exports ID). Then upload each file with `create_file`, setting `base64Content` to `sha256:<hash>:<absolute path>` and `disableConversionToGoogleType: true`.
 5. **Add the export to the "sharing work online" board.**
    - Append the export to `boards/sharing-work-online/exports.yaml`: id, title, post, size, Drive folder ID, and the Drive file ID of each slide (from the upload results).
    - Run `python3 tools/board.py`. This rebuilds `boards/sharing-work-online/board.json` with one frame per export, newest on top: the slides in a row, plus the caption and the Drive link as a note.
-   - Replace the file in Drive with `update_file`: Drive ID `1PgfrjRj0rtnMC8moAMduGHoqwYr74fsd`, in `My Drive › Art Direction › sharing work online` (folder `1pYpl1hOcFN01kkvfQNbpyM1WhThJ9GPB`).
+   - Replace `board.json` in `My Drive › Art Direction › sharing work online` (folder `1pYpl1hOcFN01kkvfQNbpyM1WhThJ9GPB`). Drive can't overwrite a file's contents from here, so trash the old `board.json` (list the folder to find its ID) and upload the new one.
    - `Art Direction` (`1bXt_1l_s2HSq593fpX5Y4Xpv8aLrKbeG`) is where the user's board app keeps its boards, one folder per board.
    - The board's images point at the slides already in `exports` through `driveImages`, so nothing is uploaded twice.
    - The script also writes a `.refboard` (a zip with board.json + images) locally. It is over the 10 MB upload limit, so it stays out of Drive and out of git.
 6. Send the user the preview and the link to the Drive folder.
 
-Never upscale art past its original size. If an image is too small for the format, place it smaller on a background instead.
+Upscale art only when it would otherwise leave obvious empty space, and by at most 1.5× (`max_upscale`). Otherwise, place it smaller on its matte.
 
 `work/` holds scratch downloads and stays out of git (see `.gitignore`).

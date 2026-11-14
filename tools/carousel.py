@@ -264,20 +264,44 @@ class Slide:
         self.d = ImageDraw.Draw(self.img)
 
     def add_logo(self, sl):
-        """Optional logo from the style (or per slide): logo: path, logo_pos: tl/tr/bl/br/bottom."""
-        path = sl.get("logo", self.s.get("logo"))
-        if not path or sl.get("logo") is False:
+        """Logo in a corner, like the Clash samples.
+
+        Style or slide keys:
+          logo:        one PNG for every background, or
+          logo_light / logo_dark: PNGs for dark / light slides (picked from the matte)
+          logo_width:  px at 1080 wide
+          logo_pos:    tl / tr / bl / br / bottom / auto (default: auto = emptiest corner,
+                       skipping the label corner)
+          logo_opacity: 0..1
+        A slide can turn it off with logo: false.
+        """
+        if sl.get("logo") is False:
             return
-        p = os.path.join(ROOT, path)
-        if not os.path.exists(p):
+        dark_bg = sum(self.img.resize((1, 1)).getpixel((0, 0))) / 3 < 140
+        path = sl.get("logo") or self.s.get("logo") or \
+            (sl.get("logo_light", self.s.get("logo_light")) if dark_bg else sl.get("logo_dark", self.s.get("logo_dark")))
+        if not path or not os.path.exists(os.path.join(ROOT, path)):
             return
-        lg = Image.open(p).convert("RGBA")
-        w = int(sl.get("logo_width", self.s.get("logo_width", 160)) * self.k)
+        lg = Image.open(os.path.join(ROOT, path)).convert("RGBA")
+        w = int(sl.get("logo_width", self.s.get("logo_width", 110)) * self.k)
         lg = lg.resize((w, round(lg.height * w / lg.width)), Image.LANCZOS)
-        pos = sl.get("logo_pos", self.s.get("logo_pos", "br"))
-        x = self.m if pos in ("tl", "bl") else (self.W - w) // 2 if pos == "bottom" else self.W - self.m - w
-        y = self.m if pos in ("tl", "tr") else self.H - self.m - lg.height
-        self.img.paste(lg, (x, y), lg)
+        op = sl.get("logo_opacity", self.s.get("logo_opacity", 1.0))
+        if op < 1:
+            lg.putalpha(lg.getchannel("A").point(lambda v: int(v * op)))
+        m = self.m
+        spots = {"tl": (m, m), "tr": (self.W - m - w, m),
+                 "bl": (m, self.H - m - lg.height), "br": (self.W - m - w, self.H - m - lg.height),
+                 "bottom": ((self.W - w) // 2, self.H - m - lg.height)}
+        pos = sl.get("logo_pos", self.s.get("logo_pos", "auto"))
+        if pos == "auto":  # the corner where the slide is plainest
+            import numpy as np
+            cands = ["br", "tr", "tl"] + ([] if sl.get("label") else ["bl"])
+            def busy(k):
+                x, y = spots[k]
+                a = np.asarray(self.img.crop((x, y, x + w, y + lg.height)).convert("L")).astype(float)
+                return a.std() + np.abs(np.diff(a, axis=1)).mean() * 4
+            pos = min(cands, key=busy)
+        self.img.paste(lg, spots[pos], lg)
 
     # ---------- slide types ----------
     def cover(self, sl):
@@ -410,8 +434,12 @@ def render(post_path):
             sl["images"] = [resolve(p) for p in sl["images"]]
         s = Slide(style, size, i, len(slides))
         getattr(s, sl.get("type", "art"))(sl)
-        f = os.path.join(out, f"{i:02d}.png")
-        s.img.save(f, optimize=True)
+        ext = style.get("format", "png")
+        f = os.path.join(out, f"{i:02d}.{ext}")
+        if ext == "jpg":
+            s.img.convert("RGB").save(f, quality=style.get("quality", 95), subsampling=0, optimize=True)
+        else:
+            s.img.save(f, optimize=True)
         files.append(f)
         print("wrote", os.path.relpath(f, ROOT))
 
@@ -429,8 +457,8 @@ def render(post_path):
     for t in thumbs:
         strip.paste(t, (x, gap))
         x += t.width + gap
-    strip.save(os.path.join(out, "preview.png"), optimize=True)
-    print("wrote", os.path.relpath(os.path.join(out, "preview.png"), ROOT))
+    strip.save(os.path.join(out, "preview.jpg"), quality=90)
+    print("wrote", os.path.relpath(os.path.join(out, "preview.jpg"), ROOT))
 
 
 if __name__ == "__main__":

@@ -39,7 +39,9 @@ def build():
     y = 0
     # newest export on top
     for n, ex in reversed(list(enumerate(exports, 1))):
-        w, h = ex.get("size", [1080, 1350])
+        sw, sh = ex.get("size", [1080, 1350])
+        sc = 1080 / sw            # show every slide 1080 wide on the board, whatever its pixel size
+        w, h = round(sw * sc), round(sh * sc)
         slides = sorted(ex["drive"])
         row_w = len(slides) * w + (len(slides) - 1) * GAP
         fx, fy = 0, y
@@ -51,8 +53,8 @@ def build():
             iid = n * 1000 + i
             items.append({"id": iid, "name": f"{ex['id']} {name[:-4]}", "sourceUrl": "",
                           "x": fx + PAD + (i - 1) * (w + GAP), "y": fy + PAD + TITLE,
-                          "scaleX": 1, "scaleY": 1, "rotation": 0, "alpha": 1,
-                          "file": f"images/{iid}.png"})
+                          "scaleX": sc, "scaleY": sc, "rotation": 0, "alpha": 1,
+                          "file": f"images/{iid}{os.path.splitext(name)[1]}"})
             drive[str(iid)] = ex["drive"][name]
         cap_path = os.path.join(ROOT, "out", ex["id"], "caption.txt")
         caption = open(cap_path).read().strip() if os.path.exists(cap_path) else ""
@@ -82,7 +84,7 @@ def build():
         z.writestr("board.json", json.dumps({k: v for k, v in board.items() if k != "driveImages"}, ensure_ascii=False))
         for n, ex in enumerate(exports, 1):
             for i, name in enumerate(sorted(ex["drive"]), 1):
-                z.write(os.path.join(ROOT, "out", ex["id"], name), f"images/{n * 1000 + i}.png")
+                z.write(os.path.join(ROOT, "out", ex["id"], name), f"images/{n * 1000 + i}{os.path.splitext(name)[1]}")
     print("wrote", os.path.relpath(ref, ROOT), f"({os.path.getsize(ref) // 1024 // 1024} MB)")
 
 

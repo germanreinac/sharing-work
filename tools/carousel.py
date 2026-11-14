@@ -32,7 +32,30 @@ SIZES = {
     "square": (1080, 1080),
     "story": (1080, 1920),
     "wide": (1920, 1080),
+    # 2x versions for sharper posts (Instagram downsizes, but keeps more detail)
+    "square-hd": (2160, 2160),
+    "ig-portrait-hd": (2160, 2700),
+    "ig-tall-hd": (2160, 2880),
 }
+
+
+def trim(im, matte, threshold=30, margin=0.03):
+    """Crop to where the drawing is: pixels that differ clearly from the matte colour."""
+    import numpy as np
+    small = im.copy()
+    small.thumbnail((800, 800))
+    a = np.asarray(small).astype(int)
+    diff = np.abs(a - np.array(matte)).max(axis=2) > threshold
+    # ignore specks: a row/column needs a few marked pixels to count
+    cols = np.where(diff.sum(axis=0) > 2)[0]
+    rows = np.where(diff.sum(axis=1) > 2)[0]
+    if len(cols) == 0 or len(rows) == 0:
+        return im
+    fx, fy = im.width / small.width, im.height / small.height
+    m = int(margin * max(im.width, im.height))
+    l, r = max(0, int(cols[0] * fx) - m), min(im.width, int((cols[-1] + 1) * fx) + m)
+    t, b = max(0, int(rows[0] * fy) - m), min(im.height, int((rows[-1] + 1) * fy) + m)
+    return im.crop((l, t, r, b))
 
 FONT_DIRS = ["/usr/share/fonts/opentype/inter", "/Library/Fonts",
              os.path.expanduser("~/Library/Fonts"), "C:/Windows/Fonts",
@@ -145,28 +168,44 @@ class Slide:
     def plate(self, sl):
         """The art fills the slide on a matte that matches the art's own background.
 
-        Options (all optional):
-          crop:  [left, top, right, bottom] as fractions of the image, e.g. [0, 0.5, 1, 1]
-          rows:  cut points (fractions of width) to split a wide sheet into strips
-                 stacked top to bottom, e.g. [0.5] = left half above right half
-          fill:  true = crop to fill the whole slide (good for covers)
-          focus: [x, y] 0..1, which part to keep when filling (default centre)
-          matte: a colour, or "auto" (default) = taken from the art's corners
-          bleed: "left" / "right" / "bottom" = put a cropped edge flush with the slide edge
-          pad:   space around the art in px (default 40)
-          label: small text at the bottom-left
-          grain: true/false, overrides the style
+        Options (all optional; boxes are [left, top, right, bottom] fractions of the source image):
+          crop:   the region to show
+          erase:  list of boxes painted over with the matte first (notes, insets, logos);
+                  add "clone" as a 5th value to copy the texture just below instead
+          tight:  trim to the drawing itself (default true, from the style), so there's no empty paper
+          rows:   cut points (fractions of width) to stack a wide sheet as strips (use sparingly)
+          fill:   true = crop to fill the whole slide (good for covers); focus: [x, y] 0..1
+          bleed:  "left" / "right" / "bottom" = put a cropped edge flush with the slide edge
+          pad:    space around the art, in px at 1080 wide (default from style, 40)
+          matte:  a colour, or "auto" (default) = taken from the art's corners
+          label:  small text at the bottom-left
+          grain:  true/false, overrides the style
+        Art is only scaled up when it would otherwise leave empty space, and never past
+        the style's max_upscale (default 1.0 = never).
         """
         im = Image.open(sl["image"]).convert("RGB")
-        if sl.get("crop"):
-            l, t, r, b = sl["crop"]
-            im = im.crop((int(l * im.width), int(t * im.height), int(r * im.width), int(b * im.height)))
+
+        def box(b, img):
+            l, t, r, bt = b
+            return (int(l * img.width), int(t * img.height), int(r * img.width), int(bt * img.height))
+
         matte = sl.get("matte", self.s.get("matte", "auto"))
         if matte == "auto":  # median of the four corners
             px = [im.getpixel(p) for p in [(2, 2), (im.width - 3, 2), (2, im.height - 3), (im.width - 3, im.height - 3)]]
             matte = tuple(sorted(c[i] for c in px)[1] for i in range(3))
         elif isinstance(matte, str):
             matte = ImageColor.getrgb(matte)
+        for e in sl.get("erase", []):
+            bx = box(e[:4], im)
+            if len(e) > 4 and e[4] == "clone":  # textured background: copy the patch just below
+                h = bx[3] - bx[1]
+                im.paste(im.crop((bx[0], bx[3], bx[2], bx[3] + h)), (bx[0], bx[1]))
+            else:
+                ImageDraw.Draw(im).rectangle(bx, fill=matte)
+        if sl.get("crop"):
+            im = im.crop(box(sl["crop"], im))
+        if sl.get("tight", self.s.get("tight", True)):
+            im = trim(im, matte)
         if sl.get("rows"):  # split a wide sheet into strips, stack them
             cuts = [0] + list(sl["rows"]) + [1]
             strips = [im.crop((int(a * im.width), 0, int(b * im.width), im.height)) for a, b in zip(cuts, cuts[1:])]
@@ -181,8 +220,8 @@ class Slide:
         self.img.paste(Image.new("RGB", (self.W, self.H), matte))
         label = sl.get("label")
         light = sum(matte) / 3 > 140
-        lab_f = self.f("SemiBold", 26)
-        lab_h = int(70 * self.k) if label else 0
+        lab_f = self.f("SemiBold", 24)
+        lab_h = int(60 * self.k) if label else 0
         if sl.get("fill"):
             fx, fy = sl.get("focus", [0.5, 0.5])
             s = max(self.W / im.width, self.H / im.height)
@@ -190,9 +229,9 @@ class Slide:
             l, t = int((im.width - self.W) * fx), int((im.height - self.H) * fy)
             self.img.paste(im.crop((l, t, l + self.W, t + self.H)), (0, 0))
         else:
-            pad = int(sl.get("pad", 40) * self.k)
+            pad = int(sl.get("pad", self.s.get("pad", 40)) * self.k)
             bw, bh = self.W - 2 * pad, self.H - 2 * pad - lab_h
-            s = min(bw / im.width, bh / im.height, 1.0)  # never upscale
+            s = min(bw / im.width, bh / im.height, float(sl.get("max_upscale", self.s.get("max_upscale", 1.0))))
             im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
             x, y = (self.W - im.width) // 2, pad + (bh - im.height) // 2
             bleed = sl.get("bleed")  # push a cropped edge flush to the slide edge
@@ -208,7 +247,7 @@ class Slide:
         if label:
             col = (60, 60, 64) if light else (225, 225, 228)
             self.d = ImageDraw.Draw(self.img)
-            self.d.text((self.m, self.H - self.m - int(26 * self.k)), label, font=lab_f, fill=col)
+            self.d.text((self.m, self.H - self.m - int(24 * self.k)), label, font=lab_f, fill=col)
         self.add_logo(sl)
 
     def add_grain(self, light):

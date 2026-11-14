@@ -1,64 +1,129 @@
 # Option 1 job: everything from sharing work online › new projects to share › ruin witch
-# (1IjhPnOqc_9Wk0867ChOq8Wtz_QclpH4o). Style: the Clash samples in style samples
-# (Sneezy carousel = 1080×1440, full-bleed art, grain, minimal text).
+# (1IjhPnOqc_9Wk0867ChOq8Wtz_QclpH4o). Style: the Clash samples (full-bleed art, grain).
+# v2 (user feedback: too much empty space, odd layout, wants 2k–3k):
+#   square 2160×2160, one subject per slide, tight crops, up to 20 slides.
 # Order follows the file dates: Artificer (Jul 2025) → Rubble Riser (Sep–Oct)
 # → model paintover (Nov) → Cleaner pivot (Jan 2026) → Rubble Knight & Trash Witch.
+# Boxes are [left, top, right, bottom] fractions of each source image.
 
 style: clash
-size: ig-tall
+size: square-hd
+style_overrides:
+  pad: 30
+  max_upscale: 1.5
 
 slides:
-  - type: plate     # cover: the lit Rubble Riser, Oct 2025 (10v9gnEBXd7pzTnGp5p_7bduOxisyyrwj)
+  # 1. cover: the lit Rubble Riser (10v9gnEBXd7pzTnGp5p_7bduOxisyyrwj)
+  - type: plate
     image: work/ruin-witch/07-lighting-4-oct2025.jpg
-    crop: [0.04, 0.172, 0.6, 0.97]
+    crop: [0.03, 0.165, 0.585, 0.975]
+    tight: false
     bleed: right
-    pad: 20
+    pad: 10
 
-  - type: plate     # 1HOwytx9CuFW6s2YZidGZ1wUluWl9SOEh
+  # 2–3. first pass, A and B (1HOwytx9CuFW6s2YZidGZ1wUluWl9SOEh)
+  - type: plate
     image: work/ruin-witch/01-artificer-2-jul2025.jpg
-    label: "July 2025 · First pass: the Artificer, shepherd of debris"
+    crop: [0.02, 0.12, 0.475, 1]
+    label: "July 2025 · The Artificer, option A"
+  - type: plate
+    image: work/ruin-witch/01-artificer-2-jul2025.jpg
+    crop: [0.505, 0.12, 0.99, 1]
+    label: "July 2025 · Option B"
 
-  - type: plate     # 1oblgb-8YFju9El4OSQVqcoLk4RMj3cG_
+  # 4–6. the debris hammer and the first Constructs (1oblgb-8YFju9El4OSQVqcoLk4RMj3cG_)
+  - type: plate
     image: work/ruin-witch/02-artificer-4-jul2025.jpg
-    crop: [0, 0.06, 1, 1]
-    rows: [0.4]
+    crop: [0, 0.1, 0.41, 1]
     label: "July 2025 · The bell became a debris hammer"
+  - type: plate
+    image: work/ruin-witch/02-artificer-4-jul2025.jpg
+    crop: [0.41, 0.1, 0.655, 1]
+    label: "July 2025 · A Construct, made of rubble"
+  - type: plate
+    image: work/ruin-witch/02-artificer-4-jul2025.jpg
+    crop: [0.665, 0.1, 1, 1]
+    label: "July 2025 · A bigger Construct"
 
-  - type: plate     # 1xMhKjbmJ9Hk2ynAH8hH-RRFz-uRmJ-mG
-    image: work/ruin-witch/03-test-animation-jul2025.jpg
-    crop: [0, 0.37, 1, 1]
-    rows: [0.56]
-    label: "July 2025 · Rough attack animation and in-game view"
-
-  - type: plate     # 18AxpJ-k9yXiHss5iNfZ9kPPOGy620M_F
+  # 7. Construct close-up (18AxpJ-k9yXiHss5iNfZ9kPPOGy620M_F); the in-game inset is painted out
+  - type: plate
     image: work/ruin-witch/04-construct-jul2025.jpg
-    crop: [0, 0, 0.71, 1]
-    label: "July 2025 · The Construct"
+    erase: [[0.715, 0, 1, 0.34]]
+    label: "July 2025 · Construct close-up"
 
-  - type: plate     # 1vaVe9vV5VNvayNYUs2ebZ1OnPAfgYv94
+  # 8–9. rough attack animation and in-game view (1xMhKjbmJ9Hk2ynAH8hH-RRFz-uRmJ-mG)
+  - type: plate
+    image: work/ruin-witch/03-test-animation-jul2025.jpg
+    crop: [0.2, 0.37, 0.64, 0.9]
+    erase: [[0.19, 0.455, 0.29, 0.505, "clone"]]
+    fill: true
+    label: "July 2025 · Rough attack animation and in-game view"
+  - type: plate
+    image: work/ruin-witch/03-test-animation-jul2025.jpg
+    crop: [0.6, 0.44, 1, 1]
+    fill: true
+    focus: [0.5, 1]
+
+  # 10–11. Sept: hammer or bell? (1QC8huhLKJa3YhzobqDlj1k256y3Uu8X3, 1vaVe9vV5VNvayNYUs2ebZ1OnPAfgYv94)
+  - type: plate
+    image: work/ruin-witch/05a-artificer-construct-3a-sep2025.jpg
+    erase: [[0.62, 0, 1, 0.19], [0, 0, 0.25, 0.05]]
+    label: "Sept 2025 · Hammer…"
+  - type: plate
     image: work/ruin-witch/05-artificer-construct-3b-sep2025.jpg
-    label: "Sept 2025 · Back to the bell"
+    erase: [[0.62, 0, 1, 0.19], [0, 0, 0.25, 0.05]]
+    label: "Sept 2025 · …or bell"
 
-  - type: plate     # 1JN6_etWDCE9MaAkT8QYB3m1eqEKSpzZP
+  # 12–13. Oct: Rubble Riser turnaround (1JN6_etWDCE9MaAkT8QYB3m1eqEKSpzZP)
+  - type: plate
     image: work/ruin-witch/06-turnaround-4-oct2025.jpg
-    rows: [0.55]
-    label: "Oct 2025 · Rubble Riser turnaround"
+    crop: [0.02, 0.1, 0.235, 1]
+    label: "Oct 2025 · Rubble Riser turnaround, back"
+  - type: plate
+    image: work/ruin-witch/06-turnaround-4-oct2025.jpg
+    crop: [0.235, 0.1, 0.545, 1]
+    label: "Oct 2025 · Front and side"
 
-  - type: plate     # 1oo5EUEeWhQ9xr9eI7LH26QoeQXAAtlDD
+  # 14. Oct: final 2D concept (1tdI2NWrd0YKoGHvny5HBICWAHa5bQWbC)
+  - type: plate
+    image: work/ruin-witch/07a-artificer-construct-4-oct2025.jpg
+    erase: [[0.66, 0, 1, 0.19], [0, 0, 0.22, 0.05]]
+    label: "Oct 2025 · Rubble Riser and his Construct"
+
+  # 15–16. Nov: paintover on the 3D model (1oo5EUEeWhQ9xr9eI7LH26QoeQXAAtlDD)
+  - type: plate
     image: work/ruin-witch/08-paintover-nov2025.jpg
-    crop: [0, 0, 1, 0.5]
-    rows: [0.535]
+    crop: [0, 0, 0.513, 1]
+    tight: false
     label: "Nov 2025 · Paintover on the 3D model"
+  - type: plate
+    image: work/ruin-witch/08-paintover-nov2025.jpg
+    crop: [0.508, 0, 1, 1]
+    tight: false
+    label: "Nov 2025 · Paintover, second pass"
 
-  - type: plate     # 108-PVJQpIp07u7K3TEPKvccawTrdDxuA
-    image: work/ruin-witch/09-cleaner-4-jan2026.jpg
-    crop: [0, 0.06, 1, 1]
-    rows: [0.575]
+  # 17. Jan 2026: the pivot (1HKZ5FJSFeXhSflQa44ONPUhczZj8839J); reference inset painted out
+  - type: plate
+    image: work/ruin-witch/09a-cleaner-1-jan2026.jpg
+    crop: [0.33, 0.04, 1, 1]
+    erase: [[0.855, 0, 1, 0.28]]
     label: "Jan 2026 · Then a pivot: the Cleaner"
 
-  - type: plate     # 15o0aNQYNZxYkXSHDEBxy69lgKpTQAxLT
+  # 18–19. Jan 2026: Cleaner in colour (108-PVJQpIp07u7K3TEPKvccawTrdDxuA)
+  - type: plate
+    image: work/ruin-witch/09-cleaner-4-jan2026.jpg
+    crop: [0.02, 0.08, 0.295, 1]
+    label: "Jan 2026 · Cleaner, colour pass"
+  - type: plate
+    image: work/ruin-witch/09-cleaner-4-jan2026.jpg
+    crop: [0.59, 0.06, 0.81, 1]
+    label: "Jan 2026 · Vacuum, cables and goggles"
+
+  # 20. Feb 2026: where it landed (15o0aNQYNZxYkXSHDEBxy69lgKpTQAxLT)
+  - type: plate
     image: work/ruin-witch/10-final-feb2026.jpg
-    rows: [0.34]
+    crop: [0.36, 0.1, 1, 0.95]
+    tight: false
     label: "Feb 2026 · Where it landed: Rubble Knight and Trash Witch"
 
 caption: |
@@ -66,7 +131,7 @@ caption: |
 
   Behind the scenes of a Clash of Clans character I worked on. It started in July 2025 as the Artificer, a "shepherd of debris": one of the Witch's kids who summons Constructs from the rubble of destroyed buildings. No magic? No problem, hit the debris hard enough.
 
-  It went through a debris hammer, back to the bell, a turnaround and a 3D paintover, then pivoted into a Cleaner before landing as the Rubble Knight and Trash Witch.
+  Then came a debris hammer, back to the bell, a turnaround and a 3D paintover, and a pivot into a Cleaner before it landed as the Rubble Knight and Trash Witch.
 
   Swipe to see the whole journey →
 

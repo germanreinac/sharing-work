@@ -1,0 +1,23 @@
+# Clash of Clans work, taken from the style samples
+# (sharing work online › style samples: Sneezy, Greedy Raven, TH18).
+# Full-bleed art, almost no text, matte that matches the art's background,
+# film grain and a soft vignette on dark slides, logo in a corner.
+
+name: clash
+colors:
+  background: "#3b3b3e"
+  title: "#ffffff"
+  text: "#e1e1e4"
+  accent: "#f2c14e"
+  muted: "#9a9aa0"
+font: Inter
+series: ""
+matte: auto          # take the background colour from each artwork
+grain: true
+art_radius: 0
+# Logos: add transparent PNGs to assets/ and set these, e.g.
+# logo: assets/supercell-logo.png   (small, corner, like the samples)
+# cover slides can set  logo: assets/clash-logo.png, logo_pos: bottom, logo_width: 720
+logo: null
+logo_pos: br
+logo_width: 150

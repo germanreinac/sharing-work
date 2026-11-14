@@ -1,0 +1,36 @@
+# Every export, in the order it was made. tools/board.py turns this into the
+# "sharing work online" board (one frame per export, slides in a row).
+# drive: Drive file IDs of the uploaded slides in sharing work online › exports.
+
+exports:
+  - id: 2026-11-14-skit-dji-design
+    title: "2026-11-14 · Skit & Dji design (instagram carousel)"
+    post: posts/2026-11-14-skit-dji-design/post.yaml
+    size: [1080, 1350]
+    folder: 1EuWb-BCaXOrzRxfAl0hiB3VEN9SUvrWb
+    drive:
+      01.png: 1ZtHI8KY9Bad67vgZLzE9Ok-MKj3YQe0h
+      02.png: 1wXKljsK65KbcdanLZOSGJ7RkfnTcUSxv
+      03.png: 1Q_7eHJKDPqpUpK4Pt9nGncoMzwEq14y8
+      04.png: 1Kbv2OGV_4c4sEZlT-Yo2xsxX2hhfqIlD
+      05.png: 1UB7jKCOJS8LFq5Pbnzvz6i30y6-UUdH4
+      06.png: 12DZIpqM3gZIG_7J2A6Lq4_LeKYjrGS2S
+      07.png: 101lhmMMrJjcDPQdJE13EUXEQnYr3RpcR
+      08.png: 1qljhOzKZOKdl4C7hcUEE2p5kRW6xSkpW
+
+  - id: 2026-11-14-ruin-witch
+    title: "2026-11-14 · Ruin Witch (instagram carousel)"
+    post: posts/2026-11-14-ruin-witch/post.yaml
+    size: [1080, 1440]
+    folder: 1yWk7-c-nun3VscldZ6hiBKOB0QD0nCAA
+    drive:
+      01.png: 1vaov1Jder15sGRhNGd7bwo-gTQPZcvQ_
+      02.png: 1NJ_FDiUj-lH2TcdJE8OnDfE9BtPp8ozg
+      03.png: 1mSQsv_MqJZ2rCWFr_a3tFAQu5QQdyFSY
+      04.png: 1b_wSITFyOutxS8LJ1vAIB7k8ESoIN_Rb
+      05.png: 134H7l0gHoTUf5NWu8LYiK_mByce69Wrn
+      06.png: 16oI_kcQC4GSaolmJaA8vwCKJp9unM_MR
+      07.png: 1czpuDrX3hRUKQq2BpqP6Ecq8aOhJkMm6
+      08.png: 1ZsN7HpHkuvJG6U9FbIk5Un-4dDDLZJ92
+      09.png: 1BzvtQyTMShptQDwixJ4yyqX6UH1DB_c4
+      10.png: 1_IYMWubq4qlduIIONsF2nFa7YzjCvPyO

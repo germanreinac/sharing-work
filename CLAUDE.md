@@ -53,6 +53,10 @@ Both use the same house style, so the user's work always looks consistent.
 
 ## House style and the carousel tool
 
+- Pick the style that matches the work: `styles/clash.yaml` for Clash of Clans and Supercell work, `styles/megalith.yaml` for Megalith.
+- `styles/clash.yaml` is taken from the Clash samples in `style samples`. Slides are 1080×1440 and use `plate` slides: full-bleed art on a matte that matches the art's own background, film grain, a vignette on dark slides, and one small dated label per slide.
+  - `plate` options: `crop`, `rows` (split a wide sheet into stacked strips so it fits a portrait slide), `fill`, `bleed`, `pad`, `label`.
+  - Logos: add transparent PNGs to `assets/` and set `logo:` in the style or per slide. They aren't there yet; ask the user for them.
 - `styles/megalith.yaml` holds the colours, font and labels. It is taken from the Megalith presentation board: dark `#1c1b20` background, yellow `#f3d36b` titles, off-white `#e9e6e2` captions, orange `#fd6848` "Behind the scenes" notes, Inter. New projects can get their own style file.
 - `posts/<YYYY-MM-DD>-<topic>/post.yaml` describes one post: style, size, slides and caption. Slide types are `cover`, `art`, `pair`, `grid` and `end`. A cover takes `focus`, from 0 (keep the top) to 1 (keep the bottom), to control the crop.
 - `python3 tools/carousel.py posts/<folder>/post.yaml` writes `out/<folder>/01.png …`, `caption.txt` and `preview.png`, which shows every slide in a row. Always look at `preview.png` before sending.
@@ -79,7 +83,14 @@ The user gives parameters (project, theme, character, period, number of slides, 
 2. Check `preview.png` and fix anything that looks off.
 3. **Export every job to its own folder** in `sharing work online › exports`, named `<YYYY-MM-DD> <topic> (<format>)`, e.g. `2026-11-14 skit-dji-design (instagram carousel)`. Put in it the numbered slides, `caption.txt` and `preview.png`. Nothing goes loose in `exports`. When a job is redone, replace the files in its existing folder instead of making a second one.
 4. To upload, create the folder with `create_file` (mimeType `application/vnd.google-apps.folder`, parent = exports ID). Then upload each file with `create_file`, setting `base64Content` to `sha256:<hash>:<absolute path>` and `disableConversionToGoogleType: true`.
-5. Send the user the preview and the link to the Drive folder.
+5. **Add the export to the "sharing work online" board.**
+   - Append the export to `boards/sharing-work-online/exports.yaml`: id, title, post, size, Drive folder ID, and the Drive file ID of each slide (from the upload results).
+   - Run `python3 tools/board.py`. This rebuilds `boards/sharing-work-online/board.json` with one frame per export, newest on top: the slides in a row, plus the caption and the Drive link as a note.
+   - Replace the file in Drive with `update_file`: Drive ID `1PgfrjRj0rtnMC8moAMduGHoqwYr74fsd`, in `My Drive › Art Direction › sharing work online` (folder `1pYpl1hOcFN01kkvfQNbpyM1WhThJ9GPB`).
+   - `Art Direction` (`1bXt_1l_s2HSq593fpX5Y4Xpv8aLrKbeG`) is where the user's board app keeps its boards, one folder per board.
+   - The board's images point at the slides already in `exports` through `driveImages`, so nothing is uploaded twice.
+   - The script also writes a `.refboard` (a zip with board.json + images) locally. It is over the 10 MB upload limit, so it stays out of Drive and out of git.
+6. Send the user the preview and the link to the Drive folder.
 
 Never upscale art past its original size. If an image is too small for the format, place it smaller on a background instead.
 

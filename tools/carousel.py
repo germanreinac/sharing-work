@@ -5,12 +5,13 @@ Usage:
     python3 tools/carousel.py posts/2026-11-14-skit-dji-design/post.yaml
 
 A post file names a style (styles/<name>.yaml), a size and a list of slides.
-Slide types:
+Slide types (see each method for options):
     cover  - one image filling the frame, with kicker, title and subtitle
     art    - one image, with an optional caption and "Behind the scenes" note
     pair   - two images side by side (or stacked when they're wide), plus text
     grid   - 3 or 4 images in a grid, plus text
     end    - text-only closing slide (title, text, handle)
+    plate  - one artwork filling the slide on a matching matte (crop, rows, fill, label)
 
 Output goes to out/<post folder name>/: 01.png, 02.png, …, caption.txt, and
 preview.png (all slides in a row, for a quick look).
@@ -21,7 +22,7 @@ import os
 import sys
 
 import yaml
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageColor, ImageDraw, ImageFont
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -139,6 +140,105 @@ class Slide:
         mask = Image.new("L", im.size, 0)
         ImageDraw.Draw(mask).rounded_rectangle((0, 0, im.width - 1, im.height - 1), r, fill=255)
         self.img.paste(im, (x, y), mask)
+
+    # ---------- plate: one artwork as the whole slide (Clash-style) ----------
+    def plate(self, sl):
+        """The art fills the slide on a matte that matches the art's own background.
+
+        Options (all optional):
+          crop:  [left, top, right, bottom] as fractions of the image, e.g. [0, 0.5, 1, 1]
+          rows:  cut points (fractions of width) to split a wide sheet into strips
+                 stacked top to bottom, e.g. [0.5] = left half above right half
+          fill:  true = crop to fill the whole slide (good for covers)
+          focus: [x, y] 0..1, which part to keep when filling (default centre)
+          matte: a colour, or "auto" (default) = taken from the art's corners
+          bleed: "left" / "right" / "bottom" = put a cropped edge flush with the slide edge
+          pad:   space around the art in px (default 40)
+          label: small text at the bottom-left
+          grain: true/false, overrides the style
+        """
+        im = Image.open(sl["image"]).convert("RGB")
+        if sl.get("crop"):
+            l, t, r, b = sl["crop"]
+            im = im.crop((int(l * im.width), int(t * im.height), int(r * im.width), int(b * im.height)))
+        matte = sl.get("matte", self.s.get("matte", "auto"))
+        if matte == "auto":  # median of the four corners
+            px = [im.getpixel(p) for p in [(2, 2), (im.width - 3, 2), (2, im.height - 3), (im.width - 3, im.height - 3)]]
+            matte = tuple(sorted(c[i] for c in px)[1] for i in range(3))
+        elif isinstance(matte, str):
+            matte = ImageColor.getrgb(matte)
+        if sl.get("rows"):  # split a wide sheet into strips, stack them
+            cuts = [0] + list(sl["rows"]) + [1]
+            strips = [im.crop((int(a * im.width), 0, int(b * im.width), im.height)) for a, b in zip(cuts, cuts[1:])]
+            w = max(s.width for s in strips)
+            gap = int(im.height * 0.04)
+            sheet = Image.new("RGB", (w, sum(s.height for s in strips) + gap * (len(strips) - 1)), matte)
+            y = 0
+            for s in strips:
+                sheet.paste(s, ((w - s.width) // 2, y))
+                y += s.height + gap
+            im = sheet
+        self.img.paste(Image.new("RGB", (self.W, self.H), matte))
+        label = sl.get("label")
+        light = sum(matte) / 3 > 140
+        lab_f = self.f("SemiBold", 26)
+        lab_h = int(70 * self.k) if label else 0
+        if sl.get("fill"):
+            fx, fy = sl.get("focus", [0.5, 0.5])
+            s = max(self.W / im.width, self.H / im.height)
+            im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
+            l, t = int((im.width - self.W) * fx), int((im.height - self.H) * fy)
+            self.img.paste(im.crop((l, t, l + self.W, t + self.H)), (0, 0))
+        else:
+            pad = int(sl.get("pad", 40) * self.k)
+            bw, bh = self.W - 2 * pad, self.H - 2 * pad - lab_h
+            s = min(bw / im.width, bh / im.height, 1.0)  # never upscale
+            im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
+            x, y = (self.W - im.width) // 2, pad + (bh - im.height) // 2
+            bleed = sl.get("bleed")  # push a cropped edge flush to the slide edge
+            if bleed == "right":
+                x = self.W - im.width
+            elif bleed == "left":
+                x = 0
+            elif bleed == "bottom":
+                y = self.H - im.height
+            self.img.paste(im, (x, y))
+        if sl.get("grain", self.s.get("grain", False)):
+            self.add_grain(light)
+        if label:
+            col = (60, 60, 64) if light else (225, 225, 228)
+            self.d = ImageDraw.Draw(self.img)
+            self.d.text((self.m, self.H - self.m - int(26 * self.k)), label, font=lab_f, fill=col)
+        self.add_logo(sl)
+
+    def add_grain(self, light):
+        """Film grain + soft vignette, like the Clash samples."""
+        import numpy as np
+        a = np.asarray(self.img).astype(np.float32)
+        rng = np.random.default_rng(7)
+        a += rng.normal(0, 9 if not light else 5, a.shape[:2])[..., None]
+        if not light:  # darken the edges a little
+            yy, xx = np.mgrid[0:self.H, 0:self.W]
+            r = np.sqrt(((xx - self.W / 2) / (self.W / 2)) ** 2 + ((yy - self.H / 2) / (self.H / 2)) ** 2)
+            a *= (1 - 0.22 * np.clip(r - 0.55, 0, 1))[..., None]
+        self.img = Image.fromarray(np.clip(a, 0, 255).astype("uint8"))
+        self.d = ImageDraw.Draw(self.img)
+
+    def add_logo(self, sl):
+        """Optional logo from the style (or per slide): logo: path, logo_pos: tl/tr/bl/br/bottom."""
+        path = sl.get("logo", self.s.get("logo"))
+        if not path or sl.get("logo") is False:
+            return
+        p = os.path.join(ROOT, path)
+        if not os.path.exists(p):
+            return
+        lg = Image.open(p).convert("RGBA")
+        w = int(sl.get("logo_width", self.s.get("logo_width", 160)) * self.k)
+        lg = lg.resize((w, round(lg.height * w / lg.width)), Image.LANCZOS)
+        pos = sl.get("logo_pos", self.s.get("logo_pos", "br"))
+        x = self.m if pos in ("tl", "bl") else (self.W - w) // 2 if pos == "bottom" else self.W - self.m - w
+        y = self.m if pos in ("tl", "tr") else self.H - self.m - lg.height
+        self.img.paste(lg, (x, y), lg)
 
     # ---------- slide types ----------
     def cover(self, sl):

@@ -1,0 +1,60 @@
+# Carousel: how Skit & Dji were designed.
+# Images come from Drive: sharing work online › exports › presentation video megalith
+# › Board assets › 04 Skit and Dji (and 01 Cold open for the cover).
+# They're downloaded to work/skit-dji/ (not in git). Drive IDs are noted per slide.
+# Text adapted from the notes on the Megalith presentation board.
+
+style: megalith
+size: ig-portrait
+
+slides:
+  - type: cover
+    image: work/skit-dji/01-05-skit-dji-mast-chilling.jpg          # 1XUa1WLWC-ohX0dM-vCU9ypE6PZoGkTDV
+    kicker: "Megalith · character design"
+    title: "How Skit & Dji were born"
+    subtitle: "From notebook doodles in 2022 to the comic pages."
+
+  - type: art
+    image: work/skit-dji/04-01-early-character-sketches.jpg      # 1W2nm-hSmLu3lY2H9HV9mVxLMDZRIg1CP
+    caption: "It started with pages of character doodles in 2022."
+    bts: "Some of these doodles turned into main characters. Others are still waiting for their island."
+
+  - type: art
+    image: work/skit-dji/04-03-explorations.jpg                  # 1SuFfjrW9ILJk9Gl6MW2vvmg6KN4pwink
+    caption: "More explorations: chunky bodies, odd heads and loud clothes."
+
+  - type: art
+    image: work/skit-dji/04-04-main-chars-18-jun-2022.jpg        # 1o-QQG_bsw6wJ7IU19bHWrvK0D31aEIBr
+    caption: "June 2022: the shortlist. Dji options on top, Skit below."
+
+  - type: art
+    image: work/skit-dji/04-05-views-5-aug-2022.jpg              # 1HCpJi65LeIzfVxDUQd5Q-Wsq3rjKlmJt
+    caption: "August 2022: picking a version and drawing them from every side."
+
+  - type: art
+    image: work/skit-dji/04-06-final-concept-7-jan-2023.jpg      # 1PVHOUl-3MMzff81dcDjYl7sF7UFEQHIs
+    caption: "January 2023: the final concept."
+    bts: "Dji still needed adjustments after this, to simplify the shapes for the comic pages."
+
+  - type: pair
+    images:
+      - work/skit-dji/04-08-re-do-with-comic-lines.jpg           # 1Y75-VPjj4D2BljIqSZcFYqilMzrsQDdU
+      - work/skit-dji/04-09-simplify-pass.jpg                    # 1v52qeL0FsD5UNiZM9wUVfs0R_cuk3Rrp
+    caption: "Then redrawn with comic-style lines, and simplified."
+    bts: "So they still read well in small panels."
+
+  - type: end
+    title: "Skit & Dji"
+    text: "Megalith is a comic by Lizz Lunney (story) and Germán Reina (art). Two friends sail between islands full of strange characters."
+    handle: "patreon.com/megalithislands"
+
+caption: |
+  How Skit & Dji were born 🛶
+
+  They took the longest to design of anyone in Megalith: doodles in 2022, a shortlist in June, views in August, the final concept in January 2023, then a comic-line redraw so they read well in small panels.
+
+  Which early version would you have picked?
+
+  Megalith is a comic by Lizz Lunney (story) and Germán Reina (art). The full process is on Patreon: patreon.com/megalithislands
+
+  #megalith #characterdesign #comicart #conceptart #processwork #sketchbook #indiecomics

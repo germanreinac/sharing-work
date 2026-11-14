@@ -1,0 +1,300 @@
+#!/usr/bin/env python3
+"""Render a social-media carousel (numbered PNGs) from a post file.
+
+Usage:
+    python3 tools/carousel.py posts/2026-11-14-skit-dji-design/post.yaml
+
+A post file names a style (styles/<name>.yaml), a size and a list of slides.
+Slide types:
+    cover  - one image filling the frame, with kicker, title and subtitle
+    art    - one image, with an optional caption and "Behind the scenes" note
+    pair   - two images side by side (or stacked when they're wide), plus text
+    grid   - 3 or 4 images in a grid, plus text
+    end    - text-only closing slide (title, text, handle)
+
+Output goes to out/<post folder name>/: 01.png, 02.png, …, caption.txt, and
+preview.png (all slides in a row, for a quick look).
+
+Artwork is never scaled up past its original size.
+"""
+import os
+import sys
+
+import yaml
+from PIL import Image, ImageDraw, ImageFont
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+SIZES = {
+    "ig-portrait": (1080, 1350),
+    "ig-tall": (1080, 1440),
+    "square": (1080, 1080),
+    "story": (1080, 1920),
+    "wide": (1920, 1080),
+}
+
+FONT_DIRS = ["/usr/share/fonts/opentype/inter", "/Library/Fonts",
+             os.path.expanduser("~/Library/Fonts"), "C:/Windows/Fonts",
+             os.path.join(ROOT, "fonts")]
+
+
+def font(family, weight, size):
+    """Find e.g. Inter-SemiBold.otf; fall back to DejaVu if Inter is missing."""
+    for d in FONT_DIRS:
+        for ext in (".otf", ".ttf"):
+            p = os.path.join(d, f"{family}-{weight}{ext}")
+            if os.path.exists(p):
+                return ImageFont.truetype(p, size)
+    bold = weight not in ("Regular", "Medium")
+    return ImageFont.truetype("DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf", size)
+
+
+def wrap(draw, text, fnt, width):
+    """Split text into lines that fit `width` pixels."""
+    lines = []
+    for para in str(text).split("\n"):
+        words, line = para.split(), ""
+        for w in words:
+            test = f"{line} {w}".strip()
+            if draw.textlength(test, font=fnt) <= width or not line:
+                line = test
+            else:
+                lines.append(line)
+                line = w
+        lines.append(line)
+    return lines
+
+
+class Slide:
+    def __init__(self, style, size, index, total):
+        self.s, self.W, self.H = style, size[0], size[1]
+        self.k = self.W / 1080  # scale factor so wide/story sizes stay proportional
+        self.m = int(60 * self.k)  # safe margin
+        if size == SIZES["story"]:
+            self.top_safe, self.bottom_safe = 250, 250
+        else:
+            self.top_safe, self.bottom_safe = self.m, self.m
+        self.img = Image.new("RGB", size, style["colors"]["background"])
+        self.d = ImageDraw.Draw(self.img)
+        self.index, self.total = index, total
+        self.fam = style.get("font", "Inter")
+
+    def f(self, weight, px):
+        return font(self.fam, weight, int(px * self.k))
+
+    def c(self, name):
+        return self.s["colors"][name]
+
+    # ---------- pieces ----------
+    def header(self, light_bg=False):
+        """Series label top-left, counter top-right."""
+        col = self.c("muted")
+        fnt = self.f("SemiBold", 24)
+        y = self.top_safe
+        self.d.text((self.m, y), self.s.get("series", ""), font=fnt, fill=col)
+        cnt = f"{self.index:02d} / {self.total:02d}"
+        self.d.text((self.W - self.m - self.d.textlength(cnt, font=fnt), y), cnt, font=fnt, fill=col)
+        return y + int(24 * self.k) + int(36 * self.k)
+
+    def text_block(self, caption=None, bts=None, measure=False):
+        """Caption (off-white) + Behind the scenes (orange). Returns height."""
+        width = self.W - 2 * self.m
+        cap_f, bts_lab_f, bts_f = self.f("Medium", 38), self.f("Bold", 22), self.f("Regular", 32)
+        gap = int(14 * self.k)
+        parts = []
+        if caption:
+            for ln in wrap(self.d, caption, cap_f, width):
+                parts.append((ln, cap_f, self.c("text"), int(50 * self.k)))
+        if bts:
+            if parts:
+                parts.append(("", None, None, int(26 * self.k)))
+            parts.append(("BEHIND THE SCENES", bts_lab_f, self.c("accent"), int(34 * self.k)))
+            for ln in wrap(self.d, bts, bts_f, width):
+                parts.append((ln, bts_f, self.c("accent"), int(43 * self.k)))
+        h = sum(p[3] for p in parts)
+        if measure or not parts:
+            return h + (gap if parts else 0)
+        y = self.H - self.bottom_safe - h
+        for ln, fnt, col, lh in parts:
+            if fnt:
+                self.d.text((self.m, y), ln, font=fnt, fill=col)
+            y += lh
+        return h + gap
+
+    def place(self, path, box, cover=False, focus=0.5):
+        """Fit an image into box=(x, y, w, h). Never upscale. Rounded corners."""
+        x, y, w, h = box
+        im = Image.open(path).convert("RGB")
+        if cover:
+            s = max(w / im.width, h / im.height)
+            im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
+            # focus: 0 = keep the top, 0.5 = centre, 1 = keep the bottom
+            l, t = (im.width - w) // 2, int((im.height - h) * focus)
+            im = im.crop((l, t, l + w, t + h))
+        else:
+            s = min(w / im.width, h / im.height, 1.0)
+            im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
+            x, y = x + (w - im.width) // 2, y + (h - im.height) // 2
+        r = int(self.s.get("art_radius", 18) * self.k) if not cover else 0
+        mask = Image.new("L", im.size, 0)
+        ImageDraw.Draw(mask).rounded_rectangle((0, 0, im.width - 1, im.height - 1), r, fill=255)
+        self.img.paste(im, (x, y), mask)
+
+    # ---------- slide types ----------
+    def cover(self, sl):
+        # Measure the text first, so the art can sit above it, not under it.
+        width = self.W - 2 * self.m
+        title_f, sub_f = self.f("ExtraBold", 96), self.f("Medium", 36)
+        n_title = len(wrap(self.d, sl.get("title", ""), title_f, width))
+        n_sub = len(wrap(self.d, sl["subtitle"], sub_f, width)) if sl.get("subtitle") else 0
+        text_h = (int(48 * self.k) if sl.get("kicker") else 0) + n_title * int(104 * self.k) \
+            + (int(18 * self.k) + n_sub * int(48 * self.k) if n_sub else 0)
+        art_h = self.H - self.bottom_safe - text_h - int(50 * self.k)
+        # Art fills the top part; it runs a little under the fade for a soft edge.
+        fade_h = int(220 * self.k)
+        self.place(sl["image"], (0, 0, self.W, art_h + fade_h // 2), cover=True, focus=sl.get("focus", 0.5))
+        grad = Image.new("L", (1, fade_h))
+        for i in range(fade_h):
+            grad.putpixel((0, i), int(255 * (i / fade_h) ** 1.2))
+        grad = grad.resize((self.W, fade_h))
+        shade = Image.new("RGB", (self.W, fade_h), self.c("background"))
+        self.img.paste(shade, (0, art_h + fade_h // 2 - fade_h), grad)
+        y = self.H - self.bottom_safe
+        lines = []
+        if sl.get("subtitle"):
+            lines += [(l, self.f("Medium", 36), self.c("text"), int(48 * self.k))
+                      for l in wrap(self.d, sl["subtitle"], self.f("Medium", 36), self.W - 2 * self.m)]
+        title_f = self.f("ExtraBold", 96)
+        tl = [(l, title_f, self.c("title"), int(104 * self.k))
+              for l in wrap(self.d, sl.get("title", ""), title_f, self.W - 2 * self.m)]
+        kick = [(sl["kicker"].upper(), self.f("Bold", 26), self.c("accent"), int(48 * self.k))] if sl.get("kicker") else []
+        block = kick + tl + ([("", None, None, int(18 * self.k))] if lines else []) + lines
+        y -= sum(b[3] for b in block)
+        for ln, fnt, col, lh in block:
+            if fnt:
+                self.d.text((self.m, y), ln, font=fnt, fill=col)
+            y += lh
+        if sl.get("swipe", True):
+            fnt = self.f("SemiBold", 24)
+            t = "SWIPE  →"
+            self.d.text((self.W - self.m - self.d.textlength(t, font=fnt), self.top_safe), t, font=fnt, fill=self.c("text"))
+
+    def _art_area(self, sl):
+        top = self.header()
+        th = self.text_block(sl.get("caption"), sl.get("bts"), measure=True)
+        bottom = self.H - self.bottom_safe - th - int(30 * self.k)
+        return top, bottom
+
+    def art(self, sl):
+        top, bottom = self._art_area(sl)
+        self.place(sl["image"], (self.m, top, self.W - 2 * self.m, bottom - top))
+        self.text_block(sl.get("caption"), sl.get("bts"))
+
+    def pair(self, sl):
+        top, bottom = self._art_area(sl)
+        a, b = sl["images"][:2]
+        gap = int(24 * self.k)
+        w, h = self.W - 2 * self.m, bottom - top
+        ims = [Image.open(p) for p in (a, b)]
+
+        def shown_area(bw, bh):  # how much art is visible if each sits in a bw×bh box
+            return sum(min(bw / i.width, bh / i.height, 1.0) ** 2 * i.width * i.height for i in ims)
+
+        if shown_area(w, (h - gap) / 2) > shown_area((w - gap) / 2, h):  # stack when that shows more art
+            hh = (h - gap) // 2
+            self.place(a, (self.m, top, w, hh))
+            self.place(b, (self.m, top + hh + gap, w, hh))
+        else:
+            ww = (w - gap) // 2
+            self.place(a, (self.m, top, ww, h))
+            self.place(b, (self.m + ww + gap, top, ww, h))
+        self.text_block(sl.get("caption"), sl.get("bts"))
+
+    def grid(self, sl):
+        top, bottom = self._art_area(sl)
+        ims = sl["images"][:4]
+        gap = int(20 * self.k)
+        w, h = self.W - 2 * self.m, bottom - top
+        cw, ch = (w - gap) // 2, (h - gap) // 2
+        cells = [(0, 0), (1, 0), (0, 1), (1, 1)]
+        if len(ims) == 3:  # big one on top, two below
+            self.place(ims[0], (self.m, top, w, ch))
+            cells, ims = [(0, 1), (1, 1)], ims[1:]
+        for p, (cx, cy) in zip(ims, cells):
+            self.place(p, (self.m + cx * (cw + gap), top + cy * (ch + gap), cw, ch))
+        self.text_block(sl.get("caption"), sl.get("bts"))
+
+    def end(self, sl):
+        self.header()
+        width = self.W - 2 * self.m
+        block = []
+        tf = self.f("ExtraBold", 80)
+        block += [(l, tf, self.c("title"), int(92 * self.k)) for l in wrap(self.d, sl.get("title", ""), tf, width)]
+        if sl.get("text"):
+            block.append(("", None, None, int(28 * self.k)))
+            xf = self.f("Medium", 38)
+            block += [(l, xf, self.c("text"), int(52 * self.k)) for l in wrap(self.d, sl["text"], xf, width)]
+        handle = sl.get("handle", self.s.get("handle"))
+        if handle:
+            block.append(("", None, None, int(40 * self.k)))
+            block.append((handle, self.f("Bold", 34), self.c("accent"), int(46 * self.k)))
+        y = (self.H - sum(b[3] for b in block)) // 2
+        for ln, fnt, col, lh in block:
+            if fnt:
+                self.d.text((self.m, y), ln, font=fnt, fill=col)
+            y += lh
+
+
+def render(post_path):
+    post_dir = os.path.dirname(os.path.abspath(post_path))
+    post = yaml.safe_load(open(post_path))
+    style = yaml.safe_load(open(os.path.join(ROOT, "styles", f"{post.get('style', 'megalith')}.yaml")))
+    style.update(post.get("style_overrides", {}))
+    size = SIZES[post.get("size", "ig-portrait")]
+    out = os.path.join(ROOT, "out", os.path.basename(post_dir))
+    os.makedirs(out, exist_ok=True)
+
+    def resolve(p):  # image paths are relative to the post file, or to the repo
+        for base in (post_dir, ROOT):
+            q = os.path.join(base, p)
+            if os.path.exists(q):
+                return q
+        sys.exit(f"Missing image: {p}")
+
+    slides = post["slides"]
+    files = []
+    for i, sl in enumerate(slides, 1):
+        sl = dict(sl)
+        if "image" in sl:
+            sl["image"] = resolve(sl["image"])
+        if "images" in sl:
+            sl["images"] = [resolve(p) for p in sl["images"]]
+        s = Slide(style, size, i, len(slides))
+        getattr(s, sl.get("type", "art"))(sl)
+        f = os.path.join(out, f"{i:02d}.png")
+        s.img.save(f, optimize=True)
+        files.append(f)
+        print("wrote", os.path.relpath(f, ROOT))
+
+    if post.get("caption"):
+        with open(os.path.join(out, "caption.txt"), "w") as fh:
+            fh.write(post["caption"].strip() + "\n")
+        print("wrote", os.path.relpath(os.path.join(out, "caption.txt"), ROOT))
+
+    # preview strip: every slide side by side, small
+    th = 540
+    thumbs = [Image.open(f).resize((round(size[0] * th / size[1]), th), Image.LANCZOS) for f in files]
+    gap = 16
+    strip = Image.new("RGB", (sum(t.width for t in thumbs) + gap * (len(thumbs) + 1), th + 2 * gap), "#111014")
+    x = gap
+    for t in thumbs:
+        strip.paste(t, (x, gap))
+        x += t.width + gap
+    strip.save(os.path.join(out, "preview.png"), optimize=True)
+    print("wrote", os.path.relpath(os.path.join(out, "preview.png"), ROOT))
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        sys.exit(__doc__)
+    render(sys.argv[1])

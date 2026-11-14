@@ -1,0 +1,16 @@
+# Megalith house style, taken from the "presentation video megalith" board
+# (Drive: sharing work online › exports). Dark board, yellow section titles,
+# off-white captions, orange "Behind the scenes" notes, Inter.
+
+name: megalith
+colors:
+  background: "#1c1b20"   # dark board
+  title: "#f3d36b"        # section titles on the board
+  text: "#e9e6e2"         # caption notes
+  accent: "#fd6848"       # "Behind the scenes" notes
+  muted: "#8c8a93"        # series label, slide counter
+  label: "#c9b8ff"        # archive label colour on the board (spare)
+font: Inter               # weights: Regular, Medium, SemiBold, Bold, ExtraBold
+series: "MEGALITH"        # small label at the top-left of every slide
+handle: ""                # social handle for the end slide, e.g. "@yourname" (ask the user)
+art_radius: 18            # rounded corners on artwork, in px at 1080 wide

@@ -6,15 +6,24 @@ This repo is where Claude prepares ready-to-post PNG images (carousels, single p
 
 The Google Drive connector is enabled on the user's claude.ai account, so every session can read Drive. No credentials need to live in this repo.
 
-**Main folder: `Claude Experiments` (`13VC4VEh_5k8ke4H5AlcGx2rt8GXFfsDQ`).** This is the user's general folder for Claude. Start every search here. When the user names a project, look for it under this folder first, then search the rest of Drive.
+**Main folder: `Claude Experiments` (`13VC4VEh_5k8ke4H5AlcGx2rt8GXFfsDQ`).** This is the user's general folder for Claude, and it has two kinds of subfolder:
+
+- **`0_my projects copy for reference`** is the art library. The user copies whole projects here, one folder per project. It is shared by all their Claude Code projects. Search here for artwork, and treat it as read-only.
+- **One folder per Claude Code project, named after the tool.** This repo's folder is `sharing work online`. The others (`sketching tool to spark ideas`, `photoshop tools`, `video editor`) belong to other projects. Leave them alone.
 
 | Folder | Drive ID | What's in it |
 | --- | --- | --- |
-| Claude Experiments (root) | `13VC4VEh_5k8ke4H5AlcGx2rt8GXFfsDQ` | Megalith, Sketching tool to spark ideas, Video Tools, photoshop tools |
-| Megalith | `1-JJqhStkAaRG2BlksDyadWmIB7YjMjGi` | whole project, presentation video, coloring tool |
-| Megalith › whole project | `1T7NjkzPD1oysEjK3oNw7N5-aWVbk0dpr` | Pages, character and environment concepts, illustrations, logo, ships, sketches, refs |
-| Megalith › presentation video › Board assets | `1FjAh9UyIwOWT0_MvHu5VLmlgALGxsYCc` | Art sorted into story sections, 01 Cold open … 11 What's next |
-| Megalith video 3 (board.json + images) | `1uO6-qMfksXiTyBKQsWXYJm4i2tOAST8S` | About 80 curated, captioned JPGs (sketchbook, stickers, page roughs, slide backgrounds) |
+| Claude Experiments (root) | `13VC4VEh_5k8ke4H5AlcGx2rt8GXFfsDQ` | The art library and the per-tool folders |
+| 0_my projects copy for reference | `18Jgg1mVAR2GZ5lJYX7CGdNMCC4EskVk3` | Art library: one folder per project. List it to see which projects are in it now. |
+| └ megalith | `1T7NjkzPD1oysEjK3oNw7N5-aWVbk0dpr` | Pages, character and environment concepts, illustrations, logo, ships, sketches, refs, Patreon, pitch |
+| **sharing work online** (this repo) | `1dlQnVZyjifqCNbS2TablzSAXC_DdB_lp` | This project's working folder |
+| └ new projects to share | `1kCrB311IpK3bx0Rdv_P-jCvflLKQrFft` | Inbox: new work the user wants posted. Check it first when asked what to post. |
+| └ style samples | `1JSWqufoC1PpfwFHpuTlgQCAPipIcexo5` | Posts and carousels whose look the user likes. Match their style. |
+| └ exports | `199Ax3vgPiBL19Vp2eyjgnfyAhudtPrMM` | Where finished PNGs go when the user asks for them in Drive |
+
+Outside the root, `Megalith video` (`1uO6-qMfksXiTyBKQsWXYJm4i2tOAST8S`) holds about 80 curated, captioned Megalith JPGs. They are good for quick picks.
+
+Project folders change as the user adds them, so list them fresh. Don't rely only on this table.
 
 Useful Drive calls:
 - List a folder: `search_files` with `parentId = '<id>'`.
@@ -40,7 +49,7 @@ Every slide in a carousel uses the same size. Keep text and faces out of the out
 2. Find the candidate images in Drive and show them a shortlist before composing.
 3. Compose with Python and Pillow (already installed). The scripts live in `tools/`.
 4. Write the finished PNGs to `out/<YYYY-MM-DD>-<topic>/01.png, 02.png, …`, plus a `caption.txt` holding post text and hashtags.
-5. Send the PNGs to the user, and upload them to Drive only if asked.
+5. Send the PNGs to the user. Upload them to `sharing work online › exports` only if asked.
 
 Never upscale art past its original size. If an image is too small for the format, place it smaller on a background instead.
 

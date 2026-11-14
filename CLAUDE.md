@@ -58,13 +58,28 @@ Both use the same house style, so the user's work always looks consistent.
 - `python3 tools/carousel.py posts/<folder>/post.yaml` writes `out/<folder>/01.png …`, `caption.txt` and `preview.png`, which shows every slide in a row. Always look at `preview.png` before sending.
 - Captions follow the board's voice: short, plain and specific (dates, names), with one "Behind the scenes" line where it adds something. The board notes in `presentation video megalith` are good source text.
 
-## Workflow
+## Workflow: two kinds of request
 
-1. The user names a project or a topic, such as "character designs for Dji".
-2. Find the candidate images in Drive (check `new projects to share` first) and show the user a shortlist before composing.
-3. Download them to `work/<topic>/`, write the post file, and render it.
-4. Check `preview.png` and fix anything that looks off.
-5. Send the PNGs to the user. Upload them to `sharing work online › exports` only if asked.
+Before building anything, work out which kind the request is.
+
+**Option 1: something small and specific, from `new projects to share`.**
+The user drops new work into `sharing work online › new projects to share` and asks for a post or slides.
+- Use what is in that folder, normally all of it. Ask only if it's unclear which files belong together.
+- Take the look from `style samples` and from the house style file, unless the user names a different reference.
+- No shortlist step is needed, because the user already chose the images. Build it and show the result.
+
+**Option 2: something bigger, from the art library.**
+The user gives parameters (project, theme, character, period, number of slides, format, platform) and asks for a carousel or presentation drawn from `0_my projects copy for reference`.
+- Search that project's folders and filter by the parameters. File and folder names, dates and any notes files are the main clues; also look at the images themselves.
+- Show the user a shortlist (file names and a one-line reason each) and a proposed slide order before rendering, because here Claude is doing the picking.
+- Then build it in the same style.
+
+**For both:**
+1. Download the source images to `work/<job>/`, write `posts/<job>/post.yaml` and render.
+2. Check `preview.png` and fix anything that looks off.
+3. **Export every job to its own folder** in `sharing work online › exports`, named `<YYYY-MM-DD> <topic> (<format>)`, e.g. `2026-11-14 skit-dji-design (instagram carousel)`. Put in it the numbered slides, `caption.txt` and `preview.png`. Nothing goes loose in `exports`. When a job is redone, replace the files in its existing folder instead of making a second one.
+4. To upload, create the folder with `create_file` (mimeType `application/vnd.google-apps.folder`, parent = exports ID). Then upload each file with `create_file`, setting `base64Content` to `sha256:<hash>:<absolute path>` and `disableConversionToGoogleType: true`.
+5. Send the user the preview and the link to the Drive folder.
 
 Never upscale art past its original size. If an image is too small for the format, place it smaller on a background instead.
 

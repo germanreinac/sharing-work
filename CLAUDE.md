@@ -6,9 +6,12 @@ This repo is where Claude prepares ready-to-post PNG images (carousels, single p
 
 The Google Drive connector is enabled on the user's claude.ai account, so every session can read Drive. No credentials need to live in this repo.
 
+**Main folder: `Claude Experiments` (`13VC4VEh_5k8ke4H5AlcGx2rt8GXFfsDQ`).** This is the user's general folder for Claude. Start every search here. When the user names a project, look for it under this folder first, then search the rest of Drive.
+
 | Folder | Drive ID | What's in it |
 | --- | --- | --- |
-| Claude Experiments | `13VC4VEh_5k8ke4H5AlcGx2rt8GXFfsDQ` | Top folder: Megalith, Sketching tool, Video Tools, photoshop tools |
+| Claude Experiments (root) | `13VC4VEh_5k8ke4H5AlcGx2rt8GXFfsDQ` | Megalith, Sketching tool to spark ideas, Video Tools, photoshop tools |
+| Megalith | `1-JJqhStkAaRG2BlksDyadWmIB7YjMjGi` | whole project, presentation video, coloring tool |
 | Megalith › whole project | `1T7NjkzPD1oysEjK3oNw7N5-aWVbk0dpr` | Pages, character and environment concepts, illustrations, logo, ships, sketches, refs |
 | Megalith › presentation video › Board assets | `1FjAh9UyIwOWT0_MvHu5VLmlgALGxsYCc` | Art sorted into story sections, 01 Cold open … 11 What's next |
 | Megalith video 3 (board.json + images) | `1uO6-qMfksXiTyBKQsWXYJm4i2tOAST8S` | About 80 curated, captioned JPGs (sketchbook, stickers, page roughs, slide backgrounds) |

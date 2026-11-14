@@ -56,10 +56,10 @@ Both use the same house style, so the user's work always looks consistent.
 - Pick the style that matches the work: `styles/clash.yaml` for Clash of Clans and Supercell work, `styles/megalith.yaml` for Megalith.
 - `styles/clash.yaml` is taken from the Clash samples in `style samples`. Slides are 1080×1440 and use `plate` slides: full-bleed art on a matte that matches the art's own background, film grain, a vignette on dark slides, and one small dated label per slide.
   - `plate` options: `crop`, `rows` (split a wide sheet into stacked strips so it fits a portrait slide), `fill`, `bleed`, `pad`, `label`.
-  - Logos, from `assets/`:
-    - The Supercell logo goes on every slide in the plainest corner (`logo_pos: auto`), white on dark slides and dark grey on light ones. `supercell-white.png` is the official file from Drive.
-    - The cover also carries the Clash of Clans logo (`logo: assets/clash-logo.png`, `logo_width: 360`). It's cut out of the Greedy Raven sample.
-    - Keep logos small, so they don't cover the art.
+  - Logos, from `assets/`, sized and placed like the style samples (the logos live inside the sample posts, there are no separate logo files):
+    - Cover: the Clash of Clans logo, large, at the bottom (`logo: assets/clash-logo.png`, `logo_width` about 380–480, in empty space where possible). It's cut out of the TH18 `thumbnail.jpg` sample.
+    - Every other slide: the Supercell logo at about 14% of the width (`logo_width: 150`), bottom-right when that corner is clear, otherwise the plainest corner. White on dark slides, near-black on light ones. `supercell-white.png` is the official file from Drive.
+    - Check the contact sheet: if a logo crowds the art or notes on a slide, set `logo_pos` or a smaller `logo_width` on that slide.
   - Default Clash format: `square-hd` (2160×2160). Use one subject per slide with tight crops, up to 20 slides. Never shrink a whole wide sheet onto one slide. Split it into its characters instead.
   - Extra `plate` options: `erase` (paint out notes and insets, or use `"clone"` on textured backgrounds) and `tight` (auto-trim to the drawing, on by default).
 - `styles/megalith.yaml` holds the colours, font and labels. It is taken from the Megalith presentation board: dark `#1c1b20` background, yellow `#f3d36b` titles, off-white `#e9e6e2` captions, orange `#fd6848` "Behind the scenes" notes, Inter. New projects can get their own style file.

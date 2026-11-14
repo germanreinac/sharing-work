@@ -300,7 +300,8 @@ class Slide:
                 x, y = spots[k]
                 a = np.asarray(self.img.crop((x, y, x + w, y + lg.height)).convert("L")).astype(float)
                 return a.std() + np.abs(np.diff(a, axis=1)).mean() * 4
-            pos = min(cands, key=busy)
+            # bottom-right when it's clear (where the samples put it), else the plainest corner
+            pos = "br" if busy("br") < 6 else min(cands, key=busy)
         self.img.paste(lg, spots[pos], lg)
 
     # ---------- slide types ----------

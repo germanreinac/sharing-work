@@ -21,7 +21,8 @@ slides:
     bleed: right
     pad: 10
     logo: assets/clash-logo.png
-    logo_width: 360
+    logo_width: 380
+    logo_pos: bl
     logo_opacity: 1
 
   # 2–3. first pass, A and B (1HOwytx9CuFW6s2YZidGZ1wUluWl9SOEh)
@@ -99,6 +100,8 @@ slides:
     crop: [0, 0, 0.513, 1]
     tight: false
     label: "Nov 2025 · Paintover on the 3D model"
+    logo_width: 100
+    logo_pos: tr
   - type: plate
     image: work/ruin-witch/08-paintover-nov2025.jpg
     crop: [0.508, 0, 1, 1]

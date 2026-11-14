@@ -15,14 +15,15 @@ series: ""
 matte: auto          # take the background colour from each artwork
 grain: true
 art_radius: 0
-# Logos (assets/): Supercell in the plainest corner of every slide, white on dark
-# slides and dark grey on light ones; the cover adds the Clash of Clans logo
-# (per slide: logo: assets/clash-logo.png). The Clash logo is cut out of the
-# Greedy Raven sample; supercell-white.png is the official file from Drive.
+# Logos (assets/), sized and placed like the style samples (Sneezy, TH18):
+# - cover: big Clash of Clans logo at the bottom (per slide: logo: assets/clash-logo.png,
+#   logo_width ~440). clash-logo.png is cut out of the TH18 thumbnail sample.
+# - other slides: Supercell, about 14% of the width, bottom-right when that corner is
+#   clear, else the plainest corner; white on dark slides, dark on light ones.
 logo_light: assets/supercell-white.png
 logo_dark: assets/supercell-dark.png
-logo_width: 95
-logo_opacity: 0.9
+logo_width: 150
+logo_opacity: 1
 logo_pos: auto
 # Export as high-quality JPEG: about 1–2 MB a slide at 2160 px, under the
 # ~3 MB upload limit from Claude's session; Instagram re-encodes to JPEG anyway.

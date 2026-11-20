@@ -43,13 +43,23 @@ Useful Drive calls:
 
 Every slide in a carousel uses the same size. Keep text and faces out of the outer 60 px, and out of the top and bottom 250 px on 9:16.
 
-## What this project is for
+## What this project is for (approach agreed 2026-11-20)
 
-The user loses a lot of time adapting each new piece of work to a template. This repo does that repetitive part for two kinds of output:
-1. **Social posts:** Instagram carousels, single posts and stories, later with video.
-2. **Virtual board presentations:** slides to present in artdirection.io or a `.refboard`, like the Megalith deck.
+The user wants to stop doing repetitive Photoshop work. The job is done in two passes. **Pass 1 is the default for any new project**; only do pass 2 when asked.
 
-Both use the same house style, so the user's work always looks consistent.
+**Pass 1: logos added, nothing else changed (ArtStation and the website).**
+- The user's images are finished. Keep each one exactly as it is: same proportions, same crop, same content. Never recompose, split, crop, re-background or add grain.
+- Add the client logo (Supercell for Clash of Clans work) in a clear spot, sized like the style samples. Optionally add one line of title text to an image that has no context on it, and only when the user asks.
+- Tool: `python3 tools/brand.py posts/<job>/brand.yaml`. It reads a folder of originals and writes `out/<job>/<same file names>.jpg`, `contact-sheet.jpg` and `placement.txt`.
+  - The logo goes in the emptiest corner (bottom-right preferred). If no corner is clear it slides along an edge, then tries a smaller size. Dark logo on light images, white on dark ones.
+  - Per-image overrides in `brand.yaml`: `pos` (tl/tr/bl/br), `scale`, `logo` (supercell/clash/none), `title`, `skip`.
+  - Exports keep the proportions but cap the long side at 4000 px, as JPEG under 2.9 MB, because of the upload limit from this session.
+  - Always look at `contact-sheet.jpg`, and fix any logo that touches art or text with an override.
+- Export to its own folder in `exports`, named `<date> <project> (logos added, artstation + website)`.
+
+**Pass 2: Instagram.** Decide per project how to split it into posts and carousels (Instagram forces one shape per carousel). This is still being designed with the user. The carousel tool below is the first attempt; the user found its results off (too much empty space, odd layouts), so don't run it on new work without agreeing the approach first.
+
+**Never commit artwork.** Rendered images in `out/` and downloads in `work/` stay out of git (client work under NDA-style terms). Commit only code, config and captions; stage files by name, not with `git add -A`.
 
 ## House style and the carousel tool
 

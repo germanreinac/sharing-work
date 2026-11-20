@@ -1,0 +1,13 @@
+# Pass 1 (ArtStation + website): Ruin Witch images as they are, logos added.
+# Source: sharing work online › new projects to share › ruin witch (19 JPGs; the 3 GIFs are left out).
+source: work/ruin-witch-src
+logo: supercell
+logo_scale: 0.15
+max_side: 4000
+max_mb: 2.9
+images:
+  # bottom-left like "Artificer and Construct 4", so the set is consistent (the logo sits on the soft ground shadow)
+  "Artificer and Construct 3_A.jpg": {pos: bl}
+  "Artificer and Construct 3_B.jpg": {pos: bl}
+  "Artificer and Construct 4 - Lighting.jpg": {pos: bl}
+  "Artificer Test Animation.jpg": {pos: bl}

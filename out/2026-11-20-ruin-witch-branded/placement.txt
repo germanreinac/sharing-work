@@ -1,19 +1,21 @@
-Artificer 2.jpg: 7968x4822 -> 4000x2421, supercell right edge (busy 0.0), q95, 1.5 MB
-Artificer 3.jpg: 10263x3048 -> 4000x1188, supercell tr (busy 0.0), q95, 0.8 MB
-Artificer 4.jpg: 10263x3048 -> 4000x1188, supercell tr (busy 0.0), q95, 0.8 MB
-Artificer Test Animation.jpg: 3091x2574 -> 3091x2574, supercell bl (busy 20.4), q95, 1.9 MB
-Artificer and Construct 3 - Turnaround.jpg: 8057x2513 -> 4000x1248, supercell tr (busy 0.0), q95, 0.8 MB
-Artificer and Construct 3_A.jpg: 4469x3251 -> 4000x2910, supercell bl (busy 8.0), q95, 1.6 MB
-Artificer and Construct 3_B.jpg: 4469x3251 -> 4000x2910, supercell bl (busy 8.0), q95, 1.6 MB
-Artificer and Construct 4 - Lighting.jpg: 4965x3251 -> 4000x2619, supercell bl (busy 7.8), q95, 1.4 MB
-Artificer and Construct 4 - Turnaround.jpg: 8755x2513 -> 4000x1148, supercell tr (busy 0.0), q95, 0.8 MB
-Artificer and Construct 4.jpg: 4965x3251 -> 4000x2619, supercell bl (busy 0.0), q95, 1.5 MB
-Artificer and Construct.jpg: 4156x1485 -> 4000x1429, supercell br (busy 0.5), q95, 1.0 MB
-Artificer_Cleaner.jpg: 5000x2127 -> 4000x1702, supercell br (busy 0.0), q95, 0.7 MB
-Artificer_Cleaner_2.jpg: 7811x2127 -> 4000x1089, supercell br (busy 0.0), q95, 0.7 MB
-Artificer_Cleaner_3.jpg: 7811x2127 -> 4000x1089, supercell tr (busy 0.0), q95, 0.8 MB
-Artificer_Cleaner_4.jpg: 11112x3012 -> 4000x1084, supercell bl (busy 0.0), q95, 0.8 MB
-Construct.jpg: 3923x3050 -> 3923x3050, supercell br (busy 0.0), q95, 1.2 MB
-Info Screen Sketch.jpg: 5259x2783 -> 4000x2117, supercell tr (busy 0.0), q95, 0.8 MB
-artificier_modelturn01_paintover_14Nov2025.jpg: 4202x2595 -> 4000x2470, supercell left edge (busy 6.3), q95, 1.4 MB
-construct sketch copy.jpg: 2951x1382 -> 2951x1382, supercell br (busy 0.0), q95, 0.5 MB
+Artificer 2.jpg: 7968x4822 -> 4000x2421, lockup right edge (6.7), q95, 1.5 MB
+Artificer 3.jpg: 10263x3048 -> 4000x1188, lockup tr (0.0), q95, 0.8 MB
+Artificer 4.jpg: 10263x3048 -> 4000x1188, lockup tr (0.0), q95, 0.8 MB
+Artificer Test Animation.jpg: 3091x2574 -> 3091x2574, lockup bottom edge (13.0), q95, 2.0 MB  <-- check
+Artificer and Construct 3 - Turnaround.jpg: 8057x2513 -> 4000x1248, lockup tr (0.0), q95, 0.9 MB
+Artificer and Construct 3_A.jpg: 4469x3251 -> 4000x2910, lockup bl (0.0), q95, 1.7 MB
+Artificer and Construct 3_B.jpg: 4469x3251 -> 4000x2910, lockup bl (0.0), q95, 1.7 MB
+Artificer and Construct 4 - Lighting.jpg: 4965x3251 -> 4000x2619, lockup right edge (0.0), q95, 1.4 MB
+Artificer and Construct 4 - Turnaround.jpg: 8755x2513 -> 4000x1148, lockup tr (0.0), q95, 0.9 MB
+Artificer and Construct 4.jpg: 4965x3251 -> 4000x2619, lockup bl (0.0), q95, 1.6 MB
+Artificer and Construct.jpg: 4156x1485 -> 4000x1429, lockup right edge (0.0), q95, 1.0 MB
+Artificer-Test-Animation-2.gif: 2596x1188 -> 1816x830, lockup left edge (9.9), anim, 2.3 MB  <-- check
+Artificer_Cleaner.jpg: 5000x2127 -> 4000x1702, lockup bl (0.0), q95, 0.7 MB
+Artificer_Cleaner_2.jpg: 7811x2127 -> 4000x1089, lockup br (0.0), q95, 0.7 MB
+Artificer_Cleaner_3.jpg: 7811x2127 -> 4000x1089, lockup tr (0.0), q95, 0.8 MB
+Artificer_Cleaner_4.jpg: 11112x3012 -> 4000x1084, lockup tr (0.0), q95, 0.9 MB
+Construct.jpg: 3923x3050 -> 3923x3050, lockup right edge (0.0), q95, 1.3 MB
+Info Screen Sketch.jpg: 5259x2783 -> 4000x2117, lockup tr (0.0), q95, 0.9 MB
+artificier_modelturn01_paintover_14Nov2025.gif: 4202x1298 -> 4000x1234, lockup right edge (0.0), anim, 2.0 MB
+artificier_modelturn01_paintover_14Nov2025.jpg: 4202x2595 -> 4000x2470, lockup left edge (4.0), q95, 1.4 MB
+construct sketch copy.jpg: 2951x1382 -> 2951x1382, lockup tr (0.0), q95, 0.6 MB

@@ -49,11 +49,14 @@ The user wants to stop doing repetitive Photoshop work. The job is done in two p
 
 **Pass 1: logos added, nothing else changed (ArtStation and the website).**
 - The user's images are finished. Keep each one exactly as it is: same proportions, same crop, same content. Never recompose, split, crop, re-background or add grain.
-- Add the client logo (Supercell for Clash of Clans work) in a clear spot, sized like the style samples. Optionally add one line of title text to an image that has no context on it, and only when the user asks.
-- Tool: `python3 tools/brand.py posts/<job>/brand.yaml`. It reads a folder of originals and writes `out/<job>/<same file names>.jpg`, `contact-sheet.jpg` and `placement.txt`.
-  - The logo goes in the emptiest corner (bottom-right preferred). If no corner is clear it slides along an edge, then tries a smaller size. Dark logo on light images, white on dark ones.
-  - Per-image overrides in `brand.yaml`: `pos` (tl/tr/bl/br), `scale`, `logo` (supercell/clash/none), `title`, `skip`.
-  - Exports keep the proportions but cap the long side at 4000 px, as JPEG under 2.9 MB, because of the upload limit from this session.
+- Add the client logos in a clear spot. For Clash of Clans work that is **both** logos, always: Clash of Clans and Supercell, side by side as one unit (`logos: [lockup]`, the default). Optionally add one line of title text to an image that has no context on it, and only when the user asks.
+- **Every file comes out in the format it came in:** a JPG or PNG as a JPG, a GIF as a GIF, a video as an MP4. Never leave GIFs or videos out.
+- Tool: `python3 tools/brand.py posts/<job>/brand.yaml`. It reads a folder of originals and writes `out/<job>/<same file names>`, `contact-sheet.jpg` and `placement.txt`.
+  - The lockup goes in the emptiest corner (bottom-right preferred). If no corner is clear it slides along an edge, then tries a smaller size. Dark Supercell on light images, white on dark ones.
+  - On GIFs and videos the logos are overlaid on every frame with ffmpeg, and anything that moves counts as busy, so the lockup never sits over the animation.
+  - Per-image overrides in `brand.yaml`: `pos` (tl/tr/bl/br), `scale`, `logos` (e.g. `[supercell]`, or `[supercell, clash]` to place them separately), `title`, `skip`.
+  - Exports keep the proportions but cap the long side at 4000 px and each file at 2.9 MB, because of the upload limit from this session. GIFs are scaled down until they fit.
+  - Drive downloads are capped at 10 MB a file. A bigger GIF or video can't be fetched from here; tell the user which file it was.
   - Always look at `contact-sheet.jpg`, and fix any logo that touches art or text with an override.
 - Export to its own folder in `exports`, named `<date> <project> (logos added, artstation + website)`.
 
